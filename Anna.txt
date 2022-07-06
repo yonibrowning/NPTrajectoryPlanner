@@ -1,0 +1,5 @@
+(0.0, 0.0, 0.0)
+1, Type,4,apAngle, 16, mlAngle, -16, spin, 0, X, 1.248319, Y, 1.042058, Z, -1.125715
+2, Type,4,apAngle, -14, mlAngle, -35, spin, 90, X, 1.264199, Y, 1.621336, Z, -0.5878145
+3, Type,4,apAngle, -14, mlAngle, 0, spin, 90, X, -1.77512, Y, 1.029027, Z, -0.4883818
+4, Type,4,apAngle, -14, mlAngle, -16, spin, 90, X, -2.352468, Y, 1.284817, Z, -0.9714765

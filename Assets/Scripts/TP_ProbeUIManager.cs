@@ -121,8 +121,29 @@ public class TP_ProbeUIManager : MonoBehaviour
             Vector3 endPos = tipPos + probeTipOffset.transform.up * mmRecordingSize;
             //GameObject.Find("recording_bot").transform.position = tipPos;
             //GameObject.Find("recording_top").transform.position = endPos;
+<<<<<<< Updated upstream:Assets/Scripts/TP_ProbeUIManager.cs
             tip_apdvlr = utils.WorldSpace2apdvlr(tipPos + tpmanager.GetCenterOffset());
             top_apdvlr = utils.WorldSpace2apdvlr(endPos + tpmanager.GetCenterOffset());
+=======
+            if (brainWarper)
+            {
+                Vector3 tmp_tip_pos = brainWarper.TransformPointForward((tipPos + tpmanager.GetCenterOffset()) * 1000) / 1000;
+                Vector3 tmp_top_pos = brainWarper.TransformPointForward((endPos + tpmanager.GetCenterOffset()) * 1000) / 1000;
+
+                Debug.Log(tipPos.ToString() + "; "+ tmp_tip_pos.ToString());
+                tip_apdvlr = utils.WorldSpace2apdvlr(tmp_tip_pos);
+                top_apdvlr = utils.WorldSpace2apdvlr(tmp_top_pos);
+
+            }
+            else
+            {
+                tip_apdvlr = utils.WorldSpace2apdvlr(tipPos + tpmanager.GetCenterOffset());
+                top_apdvlr = utils.WorldSpace2apdvlr(endPos + tpmanager.GetCenterOffset());
+            }
+
+
+
+>>>>>>> Stashed changes:Assets/Scripts/ProbeUIManager.cs
             List<int> mmPos = new List<int>();
             for (int i = Mathf.Max(1,Mathf.CeilToInt(mmStartPos)); i <= Mathf.Min(9,Mathf.FloorToInt(mmEndPos)); i++)
                 mmPos.Add(i); // this is the list of values we are going to have to assign a position to
@@ -147,14 +168,35 @@ public class TP_ProbeUIManager : MonoBehaviour
         }
         else
         {
+<<<<<<< Updated upstream:Assets/Scripts/TP_ProbeUIManager.cs
             tip_apdvlr = utils.WorldSpace2apdvlr(probeTipOffset.transform.position + tpmanager.GetCenterOffset());
             top_apdvlr = utils.WorldSpace2apdvlr(probeEndOffset.transform.position + tpmanager.GetCenterOffset());
+=======
+            if (brainWarper)
+            {
+                tip_apdvlr = utils.WorldSpace2apdvlr(brainWarper.TransformPointForward((probeTipOffset.transform.position + tpmanager.GetCenterOffset()))*1000);
+                top_apdvlr = utils.WorldSpace2apdvlr(brainWarper.TransformPointForward((probeEndOffset.transform.position + tpmanager.GetCenterOffset()))*1000)/1000;
+            }
+            else
+            {
+                tip_apdvlr = utils.WorldSpace2apdvlr(probeTipOffset.transform.position + tpmanager.GetCenterOffset());
+                top_apdvlr = utils.WorldSpace2apdvlr(probeEndOffset.transform.position + tpmanager.GetCenterOffset());
+            }
+            //tip_apdvlr = utils.WorldSpace2apdvlr(probeTipOffset.transform.position + tpmanager.GetCenterOffset());
+            //top_apdvlr = utils.WorldSpace2apdvlr(probeEndOffset.transform.position + tpmanager.GetCenterOffset());
+>>>>>>> Stashed changes:Assets/Scripts/ProbeUIManager.cs
             //GameObject.Find("recording_bot").transform.position = probeTipOffset.transform.position;
             //GameObject.Find("recording_top").transform.position = probeEndOffset.transform.position;
         }
 
+<<<<<<< Updated upstream:Assets/Scripts/TP_ProbeUIManager.cs
         // Interpolate from the tip to the top, putting this data into the probe panel texture
         (Color[] interpolatedColors, List<int> boundaryHeights, List<int> centerHeights, List<string> names) = InterpolateAnnotationIDs(tip_apdvlr, top_apdvlr);
+=======
+         //Debug.Log(tip_apdvlr);
+         // Interpolate from the tip to the top, putting this data into the probe panel texture
+         (Color[] interpolatedColors, List<int> boundaryHeights, List<int> centerHeights, List<string> names) = InterpolateAnnotationIDs(tip_apdvlr, top_apdvlr);
+>>>>>>> Stashed changes:Assets/Scripts/ProbeUIManager.cs
 
 
         if (tpmanager.RecordingRegionOnly())

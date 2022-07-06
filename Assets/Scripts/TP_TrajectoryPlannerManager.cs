@@ -36,6 +36,8 @@ public class TP_TrajectoryPlannerManager : MonoBehaviour
     private List<Collider> rigColliders;
     private List<Collider> allNonActiveColliders;
 
+    //private ProbeSelector probeSelectr;
+
     Color[] probeColors;
 
     // Values
@@ -47,6 +49,11 @@ public class TP_TrajectoryPlannerManager : MonoBehaviour
 
     // Manual coordinate entry
     [SerializeField] private TP_CoordinateEntryPanel manualCoordinatePanel;
+<<<<<<< Updated upstream:Assets/Scripts/TP_TrajectoryPlannerManager.cs
+=======
+    [SerializeField] public TP_RigCoordinateEntryPanel rigCoordinatePanel;
+    private bool useRig = false;
+>>>>>>> Stashed changes:Assets/Scripts/TrajectoryPlannerManager.cs
 
     // Track who got clicked on, probe, camera, or brain
     public bool ProbeControl { get; set; }
@@ -61,7 +68,10 @@ public class TP_TrajectoryPlannerManager : MonoBehaviour
 
     private int visibleProbePanels;
 
+<<<<<<< Updated upstream:Assets/Scripts/TP_TrajectoryPlannerManager.cs
     Task annotationDatasetLoadTask;
+=======
+>>>>>>> Stashed changes:Assets/Scripts/TrajectoryPlannerManager.cs
 
     private void Awake()
     {
@@ -207,7 +217,9 @@ public class TP_TrajectoryPlannerManager : MonoBehaviour
             }
 
             if (movedThisFrame)
+            {
                 inPlaneSlice.UpdateInPlaneSlice();
+            }
         }
     }
 
@@ -287,7 +299,14 @@ public class TP_TrajectoryPlannerManager : MonoBehaviour
     {
         AddNewProbe(probeType);
     }
+<<<<<<< Updated upstream:Assets/Scripts/TP_TrajectoryPlannerManager.cs
     public TP_ProbeController AddNewProbe(int probeType)
+=======
+
+
+
+    public ProbeController AddNewProbe(int probeType)
+>>>>>>> Stashed changes:Assets/Scripts/TrajectoryPlannerManager.cs
     {
         CountProbePanels();
         if (visibleProbePanels >= 16)
@@ -357,7 +376,14 @@ public class TP_TrajectoryPlannerManager : MonoBehaviour
         Debug.Log("Setting active probe to: " + newActiveProbeController.gameObject.name);
         activeProbeController = newActiveProbeController;
 
+<<<<<<< Updated upstream:Assets/Scripts/TP_TrajectoryPlannerManager.cs
         foreach (TP_ProbeUIManager puimanager in activeProbeController.gameObject.GetComponents<TP_ProbeUIManager>())
+=======
+
+
+
+        foreach (ProbeUIManager puimanager in activeProbeController.gameObject.GetComponents<ProbeUIManager>())
+>>>>>>> Stashed changes:Assets/Scripts/TrajectoryPlannerManager.cs
             puimanager.ProbeSelected(true);
 
         foreach (TP_ProbeController pcontroller in allProbes)
@@ -371,6 +397,15 @@ public class TP_TrajectoryPlannerManager : MonoBehaviour
             if (!activeProbeColliders.Contains(collider))
                 inactiveProbeColliders.Add(collider);
         UpdateNonActiveColliders();
+
+        /// * FOR SOME REASON, OLD VERSION OF THIS CODE TRIGGERED AN INFINTE LOOP!
+        /// * the new version puts SetTextValues in a coroutine; this seems to fix the problem,
+        //  * but if you encounter further problems start debugging here - Yoni
+        if (useRig)
+        {
+            rigCoordinatePanel.SetTextValues(activeProbeController);
+        }
+
 
         // Also update the recording region size slider
         recRegionSlider.SliderValueChanged(activeProbeController.GetRecordingRegionSize());
@@ -580,4 +615,8 @@ public class TP_TrajectoryPlannerManager : MonoBehaviour
     {
         return localPrefs.GetStereotaxic();
     }
+<<<<<<< Updated upstream:Assets/Scripts/TP_TrajectoryPlannerManager.cs
+=======
+
+>>>>>>> Stashed changes:Assets/Scripts/TrajectoryPlannerManager.cs
 }

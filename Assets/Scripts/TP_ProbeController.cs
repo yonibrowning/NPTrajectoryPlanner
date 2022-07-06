@@ -94,6 +94,8 @@ public class TP_ProbeController : MonoBehaviour
 
     private void Awake()
     {
+
+
         textGO = Instantiate(textPrefab, GameObject.Find("CoordinatePanel").transform);
         textButton = textGO.GetComponent<Button>();
         textButton.onClick.AddListener(Probe2Text);
@@ -116,7 +118,8 @@ public class TP_ProbeController : MonoBehaviour
     private void Start()
     {
         initialPosition = transform.position;
-        initialRotation = transform.rotation;
+        initialRotation =  Quaternion.identity;
+
 
         ResetPositionTracking();
         SetProbePosition();
@@ -352,6 +355,7 @@ public class TP_ProbeController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.R))
             keyHeld = false;
 
+<<<<<<< Updated upstream:Assets/Scripts/TP_ProbeController.cs
         if (Input.GetKeyDown(KeyCode.F))
         {
             moved = true;
@@ -366,6 +370,16 @@ public class TP_ProbeController : MonoBehaviour
         }
         if (Input.GetKeyUp(KeyCode.F))
             keyHeld = false;
+=======
+            if (keyDown & tpmanager.rigCoordinatePanel.keyboardMovement)
+            {
+                SetProbePositionAINDRig();
+                bool collided = CheckCollisions(otherColliders);
+                if (collided)
+                {
+                    rigCoordinates = initialCoordinates;
+                    SetProbePositionAINDRig();
+>>>>>>> Stashed changes:Assets/Scripts/ProbeController.cs
 
         // Spin controls
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -514,7 +528,7 @@ public class TP_ProbeController : MonoBehaviour
     {
         // Reset everything
         transform.position = initialPosition;
-        transform.rotation = initialRotation;
+        transform.rotation = Quaternion.identity;//initialRotation;
         ResetPositionTracking();
 
         // Manually adjust the coordinates and rotation
@@ -531,8 +545,80 @@ public class TP_ProbeController : MonoBehaviour
         else
             transform.Translate(0f, -depth, 0f);
         this.depth = depth;
+<<<<<<< Updated upstream:Assets/Scripts/TP_ProbeController.cs
 
         UpdateText();
+=======
+    }
+
+    private float ProbePosition2Phi()
+    {
+        phi = Vector3.Angle(-Vector3.forward, transform.forward);
+        return phi;
+    }
+
+    private float ProbePosition2Theta()
+    {
+        theta = Vector3.Angle(rotateAround.up, transform.up);
+        return theta;
+    }
+
+    public void SetProbePositionAINDRig()
+    {
+        //Move probe tip position to be at the center of the the rig.
+        SetProbePositionToAINDRigCenter(rigController.rigCenter);
+
+        // Set XYZ
+        rigCoordinates.manipulatorX = Mathf.Clamp(rigCoordinates.manipulatorX, -7.5f, 7.5f);
+        rigCoordinates.manipulatorY = Mathf.Clamp(rigCoordinates.manipulatorY, -7.5f, 7.5f);
+        rigCoordinates.manipulatorZ = Mathf.Clamp(rigCoordinates.manipulatorZ, -7.5f, 7.5f);
+        rigCoordinates.mlArcAngle = Mathf.Clamp(rigCoordinates.mlArcAngle, -40f, 40f);
+        rigCoordinates.apArcAngle = Mathf.Clamp(rigCoordinates.apArcAngle, -75f, 75f);
+
+        transform.Translate(rigCoordinates.manipulatorX, -rigCoordinates.manipulatorZ, rigCoordinates.manipulatorY);
+
+        //Set Roll
+        transform.RotateAround(rigController.rigCenter.position, new Vector3(0f, 0f, 1f), rigCoordinates.mlArcAngle);
+
+        //Set Pitch
+        transform.RotateAround(rigController.rigCenter.position, new Vector3(-1f, 0f, 0f), rigCoordinates.apArcAngle);
+        
+        //Spin
+        transform.RotateAround(rotateAround.position, rotateAround.up, rigCoordinates.spin);
+
+    }
+
+    public void SetProbePositionToAINDRigCenter(Transform rigCenter)
+    {
+        //Set Rotation to zero!
+        transform.rotation = initialRotation;// Quaternion.identity;// ;//;
+        //Debug.Log(initialRotation);
+        transform.Rotate(new Vector3(0f, 180f, 0f)); //Our zero is different from Unity's
+        //Find difference between probe tip and rig center
+        Vector3 diff = probeTipT.position - rigCenter.position;
+        //Move to rig center
+        transform.position -= diff;
+        apml = apml - new Vector2(diff.x, diff.z);
+    }
+
+    public void MoveToAINDRigCoordinates(RigCoordinates newRigCoordinates)
+    {
+        rigCoordinates = newRigCoordinates;
+        /*rigCoordinates.manipulatorX = newRigCoordinates.manipulatorX;
+        rigCoordinates.manipulatorY = newRigCoordinates.manipulatorY;
+        rigCoordinates.manipulatorZ = newRigCoordinates.manipulatorZ;
+        rigCoordinates.mlArcAngle = newRigCoordinates.mlArcAngle;
+        rigCoordinates.apArcAngle = newRigCoordinates.apArcAngle;
+        rigCoordinates.spin = newRigCoordinates.spin;
+    */
+        SetProbePositionAINDRig();
+    }
+
+    public void CreateAINDRigCoordinates()
+    {
+        SetProbePositionToAINDRigCenter(rigController.rigCenter);
+        rigCoordinates = new RigCoordinates(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+>>>>>>> Stashed changes:Assets/Scripts/ProbeController.cs
     }
 
     public List<float> GetCoordinates()
