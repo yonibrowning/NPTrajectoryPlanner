@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using TrajectoryPlanner;
+using System;
 
 /// <summary>
 /// 3D space control for Neuropixels probes in the Trajectory Planner scene
@@ -96,6 +97,13 @@ public class ProbeManager : MonoBehaviour
     private List<GameObject> visibleProbeColliders;
     private Dictionary<GameObject, Material> visibleOtherColliders;
 
+
+    //Rig Setup-->Added by Yoni
+    private bool isAttachedToRig = false;
+    public SphericalRigController rigController;
+    public SphericalRigCoordinates rigCoordinates;
+    
+
     // Text button
     GameObject textGO;
     Button textButton;
@@ -186,6 +194,23 @@ public class ProbeManager : MonoBehaviour
         initialRotation = transform.rotation;
 
         ResetPosition();
+        
+        try
+        {
+            rigController = GameObject.Find("Spherical Rig").GetComponent<SphericalRigController>();
+            if (rigCoordinates == null)
+            {
+                CreateSphericalRigCoordinates();
+            }
+            isAttachedToRig = true;
+            Debug.Log("Attached To Rig");
+        }
+        catch (NullReferenceException e)
+        {
+            isAttachedToRig = false;
+            SetProbePosition();
+        }
+        
 
         // Reset our probe UI panels
         foreach (TP_ProbeUIManager puimanager in probeUIManagers)
@@ -288,256 +313,448 @@ public class ProbeManager : MonoBehaviour
 
         // [TODO] There's probably a smart refactor to be done here so that key press/hold is functionally separate from calling the Move() functions
         // probably need to store the held KeyCodes in a list or something? 
+        if (!isAttachedToRig) //No rig, each probe controlls itself
+        {
+            // APML movements
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeAPML(-1f, 0f, true);
+            }
+            else if (Input.GetKey(KeyCode.W) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeAPML(-1f, 0f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.W))
+                keyHeld = false;
 
-        // APML movements
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            MoveProbeAPML(-1f, 0f, true);
-        }
-        else if (Input.GetKey(KeyCode.W) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            MoveProbeAPML(-1f, 0f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.W))
-            keyHeld = false;
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeAPML(1f, 0f, true);
+            }
+            else if (Input.GetKey(KeyCode.S) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeAPML(1f, 0f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.S))
+                keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            MoveProbeAPML(1f, 0f, true);
-        }
-        else if (Input.GetKey(KeyCode.S) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            MoveProbeAPML(1f, 0f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.S))
-            keyHeld = false;
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeAPML(0f, 1f, true);
+            }
+            else if (Input.GetKey(KeyCode.D) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeAPML(0f, 1f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.D))
+                keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            MoveProbeAPML(0f, 1f, true);
-        }
-        else if (Input.GetKey(KeyCode.D) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            MoveProbeAPML(0f, 1f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.D))
-            keyHeld = false;
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeAPML(0f, -1f, true);
+            }
+            else if (Input.GetKey(KeyCode.A) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeAPML(0f, -1f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.A))
+                keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            MoveProbeAPML(0f, -1f, true);
-        }
-        else if (Input.GetKey(KeyCode.A) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            MoveProbeAPML(0f, -1f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.A))
-            keyHeld = false;
+            // DV movement
 
-        // DV movement
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeDV(1f, true);
+            }
+            else if (Input.GetKey(KeyCode.Z) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeDV(1f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.Z))
+                keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            MoveProbeDV(1f, true);
-        }
-        else if (Input.GetKey(KeyCode.Z) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            MoveProbeDV(1f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.Z))
-            keyHeld = false;
+            if (Input.GetKeyDown(KeyCode.X))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeDV(-1f, true);
+            }
+            else if (Input.GetKey(KeyCode.X) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeDV(-1f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.X))
+                keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            MoveProbeDV(-1f, true);
-        }
-        else if (Input.GetKey(KeyCode.X) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            MoveProbeDV(-1f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.X))
-            keyHeld = false;
+            // Depth movement
 
-        // Depth movement
+            //if (Input.GetKeyDown(KeyCode.Z))
+            //{
+            //    moved = true;
+            //    keyPressTime = Time.realtimeSinceStartup;
+            //    MoveProbeDepth(1f, true);
+            //}
+            //else if (Input.GetKey(KeyCode.Z) && (keyHeld || keyHoldDelayPassed))
+            //{
+            //    keyHeld = true;
+            //    moved = true;
+            //    MoveProbeDepth(1f, false);
+            //}
+            //if (Input.GetKeyUp(KeyCode.Z))
+            //    keyHeld = false;
 
-        //if (Input.GetKeyDown(KeyCode.Z))
-        //{
-        //    moved = true;
-        //    keyPressTime = Time.realtimeSinceStartup;
-        //    MoveProbeDepth(1f, true);
-        //}
-        //else if (Input.GetKey(KeyCode.Z) && (keyHeld || keyHoldDelayPassed))
-        //{
-        //    keyHeld = true;
-        //    moved = true;
-        //    MoveProbeDepth(1f, false);
-        //}
-        //if (Input.GetKeyUp(KeyCode.Z))
-        //    keyHeld = false;
+            //if (Input.GetKeyDown(KeyCode.X))
+            //{
+            //    moved = true;
+            //    keyPressTime = Time.realtimeSinceStartup;
+            //    MoveProbeDepth(-1f, true);
+            //}
+            //else if (Input.GetKey(KeyCode.X) && (keyHeld || keyHoldDelayPassed))
+            //{
+            //    keyHeld = true;
+            //    moved = true;
+            //    MoveProbeDepth(-1f, false);
+            //}
+            //if (Input.GetKeyUp(KeyCode.X))
+            //    keyHeld = false;
 
-        //if (Input.GetKeyDown(KeyCode.X))
-        //{
-        //    moved = true;
-        //    keyPressTime = Time.realtimeSinceStartup;
-        //    MoveProbeDepth(-1f, true);
-        //}
-        //else if (Input.GetKey(KeyCode.X) && (keyHeld || keyHoldDelayPassed))
-        //{
-        //    keyHeld = true;
-        //    moved = true;
-        //    MoveProbeDepth(-1f, false);
-        //}
-        //if (Input.GetKeyUp(KeyCode.X))
-        //    keyHeld = false;
+            // Rotations
 
-        // Rotations
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                RotateProbe(-1f, 0f, true);
+            }
+            else if (Input.GetKey(KeyCode.Q) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                RotateProbe(-1f, 0f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.Q))
+                keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            RotateProbe(-1f, 0f, true);
-        }
-        else if (Input.GetKey(KeyCode.Q) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            RotateProbe(-1f, 0f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.Q))
-            keyHeld = false;
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                RotateProbe(1f, 0f, true);
+            }
+            else if (Input.GetKey(KeyCode.E) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                RotateProbe(1f, 0f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.E))
+                keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            RotateProbe(1f, 0f, true);
-        }
-        else if (Input.GetKey(KeyCode.E) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            RotateProbe(1f, 0f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.E))
-            keyHeld = false;
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                RotateProbe(0f, 1f, true);
+            }
+            else if (Input.GetKey(KeyCode.R) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                RotateProbe(0f, 1f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.R))
+                keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            RotateProbe(0f, 1f, true);
-        }
-        else if (Input.GetKey(KeyCode.R) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            RotateProbe(0f, 1f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.R))
-            keyHeld = false;
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                RotateProbe(0f, -1f, true);
+            }
+            else if (Input.GetKey(KeyCode.F) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                RotateProbe(0f, -1f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.F))
+                keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            RotateProbe(0f, -1f, true);
-        }
-        else if (Input.GetKey(KeyCode.F) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            RotateProbe(0f, -1f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.F))
-            keyHeld = false;
+            // Spin controls
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                SpinProbe(-1f, true);
+            }
+            else if (Input.GetKey(KeyCode.Alpha1) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                SpinProbe(-1f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.Alpha1))
+                keyHeld = false;
 
-        // Spin controls
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            SpinProbe(-1f, true);
-        }
-        else if (Input.GetKey(KeyCode.Alpha1) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            SpinProbe(-1f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.Alpha1))
-            keyHeld = false;
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                SpinProbe(1f, true);
+            }
+            else if (Input.GetKey(KeyCode.Alpha3) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                SpinProbe(1f, false);
+            }
+            if (Input.GetKeyUp(KeyCode.Alpha3))
+                keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            moved = true;
-            keyPressTime = Time.realtimeSinceStartup;
-            SpinProbe(1f, true);
-        }
-        else if (Input.GetKey(KeyCode.Alpha3) && (keyHeld || keyHoldDelayPassed))
-        {
-            keyHeld = true;
-            moved = true;
-            SpinProbe(1f, false);
-        }
-        if (Input.GetKeyUp(KeyCode.Alpha3))
-            keyHeld = false;
+            // Recording region controls
+            if (Input.GetKey(KeyCode.T))
+            {
+                moved = true;
+                ShiftRecordingRegion(1f);
+            }
+            if (Input.GetKey(KeyCode.G))
+            {
+                moved = true;
+                ShiftRecordingRegion(-1f);
+            }
+            
 
-        // Recording region controls
-        if (Input.GetKey(KeyCode.T))
-        {
-            moved = true;
-            ShiftRecordingRegion(1f);
-        }
-        if (Input.GetKey(KeyCode.G))
-        {
-            moved = true;
-            ShiftRecordingRegion(-1f);
-        }
+            if (moved)
+            {
+                // If the probe was moved, set the new position
+                SetProbePositionCCF(insertion);
 
+                // Check collisions if we need to
+                if (checkForCollisions)
+                    CheckCollisions(tpmanager.GetAllNonActiveColliders());
 
-        if (moved)
-        {
-            // If the probe was moved, set the new position
-            SetProbePositionCCF(insertion);
+                // Update all the UI panels
+                foreach (TP_ProbeUIManager puimanager in probeUIManagers)
+                    puimanager.ProbeMoved();
 
-            // Check collisions if we need to
-            if (checkForCollisions)
-                CheckCollisions(tpmanager.GetAllNonActiveColliders());
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }else {
+             SphericalRigCoordinates initialCoordinates = rigCoordinates.CopyRigCoordinates(rigCoordinates);
 
-            // Update all the UI panels
-            foreach (TP_ProbeUIManager puimanager in probeUIManagers)
-                puimanager.ProbeMoved();
+            //AP Arc Angle Move Anterior
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalArcAngles(1f, 0f, true);
+            }
+            else if (Input.GetKey(KeyCode.W) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalArcAngles(1f, 0f, true);
+            }
 
-            return true;
-        }
-        else
-        {
-            return false;
+            //AP Arc Angle Move Posterior
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalArcAngles(-1f, 0f, true);
+            }
+            else if (Input.GetKey(KeyCode.S) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalArcAngles(-1f, 0f, true);
+            }
+
+            //ML Arc Angle Move Left
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalArcAngles(0, -1f, true);
+            }
+            else if (Input.GetKey(KeyCode.A) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalArcAngles(0, -1f, true);
+            }
+
+            //ML Arc Angle Move Right
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalArcAngles(0, 1f, true);
+            }
+            else if (Input.GetKey(KeyCode.D) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalArcAngles(0, 1f, true);
+            }
+
+            //Spin Clockwise
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalSpin(-1f, true);
+            }
+            else if (Input.GetKey(KeyCode.Q) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalSpin(-1f, true);
+            }
+
+            //Spin CounterClockwise
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalSpin(1f, true);
+            }
+            else if (Input.GetKey(KeyCode.E) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalSpin(1f, true);
+            }
+
+            //Lower Probe
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalDV(1f, true);
+            }
+            else if (Input.GetKey(KeyCode.Z) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalDV(1f, true);
+            }
+
+            //Raise Probe
+            if (Input.GetKeyDown(KeyCode.X))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalDV(-1f, true);
+            }
+            else if (Input.GetKey(KeyCode.X) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalDV(-1f, true);
+            }
+
+            //Move Manipulator Right
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalXY(1,0, true);
+            }
+            else if (Input.GetKey(KeyCode.RightArrow) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalXY(1,0, true);
+            }
+
+            //Move Manipulator Left
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalXY(-1,0, true);
+            }
+            else if (Input.GetKey(KeyCode.LeftArrow) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalXY(-1,0, true);
+            }
+
+            //Move Manipulator Forward
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalXY(0,1, true);
+            }
+            else if (Input.GetKey(KeyCode.UpArrow) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalXY(0,1, true);
+            }
+
+            //Move Manipulator Backward
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                moved = true;
+                keyPressTime = Time.realtimeSinceStartup;
+                MoveProbeSphericalXY(0,-1, true);
+            }
+            else if (Input.GetKey(KeyCode.DownArrow) && (keyHeld || keyHoldDelayPassed))
+            {
+                keyHeld = true;
+                moved = true;
+                MoveProbeSphericalXY(0,-1, true);
+            }
+
+            if (moved & tpmanager.thisCoordinatePanel.GetComponent<TP_SphericalCoordinateEntryPanel>().keyboardMovement)
+            {
+                SetProbePositionSphericalRig();
+                
+                // Check collisions if we need to
+                if (checkForCollisions)
+                    CheckCollisions(tpmanager.GetAllNonActiveColliders());
+
+                // Update all the UI panels
+                foreach (TP_ProbeUIManager puimanager in probeUIManagers)
+                    puimanager.ProbeMoved();
+
+                return true;
+
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
@@ -673,6 +890,98 @@ public class ProbeManager : MonoBehaviour
 
         SetProbePosition();
     }
+    #region AIND
+
+    public void MoveProbeSphericalArcAngles(float ap, float ml, bool pressed)
+    {
+        float speed = pressed ? 
+            keyFast ? MOVE_INCREMENT_TAP_FAST : keySlow ? MOVE_INCREMENT_TAP_SLOW : MOVE_INCREMENT_TAP : 
+            keyFast ? MOVE_INCREMENT_HOLD_FAST * Time.deltaTime : keySlow ? MOVE_INCREMENT_HOLD_SLOW * Time.deltaTime : MOVE_INCREMENT_HOLD * Time.deltaTime;
+
+        rigCoordinates.apArcAngle += ap * speed;
+        rigCoordinates.mlArcAngle += ml * speed;
+    }
+
+    public void MoveProbeSphericalDV(float dv, bool pressed)
+    {
+        float speed = pressed ? 
+            keyFast ? MOVE_INCREMENT_TAP_FAST : keySlow ? MOVE_INCREMENT_TAP_SLOW : MOVE_INCREMENT_TAP : 
+            keyFast ? MOVE_INCREMENT_HOLD_FAST * Time.deltaTime : keySlow ? MOVE_INCREMENT_HOLD_SLOW * Time.deltaTime : MOVE_INCREMENT_HOLD * Time.deltaTime;
+
+        rigCoordinates.manipulatorZ += dv * speed;
+    }
+
+    public void MoveProbeSphericalXY(float x,float y, bool pressed)
+    {
+        float speed = pressed ? 
+            keyFast ? MOVE_INCREMENT_TAP_FAST : keySlow ? MOVE_INCREMENT_TAP_SLOW : MOVE_INCREMENT_TAP : 
+            keyFast ? MOVE_INCREMENT_HOLD_FAST * Time.deltaTime : keySlow ? MOVE_INCREMENT_HOLD_SLOW * Time.deltaTime : MOVE_INCREMENT_HOLD * Time.deltaTime;
+
+        rigCoordinates.manipulatorX += x * speed;
+        rigCoordinates.manipulatorY += y * speed;
+    }
+
+    public void MoveProbeSphericalSpin(float s,bool pressed){
+        float speed = pressed ? 
+            keyFast ? MOVE_INCREMENT_TAP_FAST : keySlow ? MOVE_INCREMENT_TAP_SLOW : MOVE_INCREMENT_TAP : 
+            keyFast ? MOVE_INCREMENT_HOLD_FAST * Time.deltaTime : keySlow ? MOVE_INCREMENT_HOLD_SLOW * Time.deltaTime : MOVE_INCREMENT_HOLD * Time.deltaTime;
+
+        rigCoordinates.spin += s * speed;
+    }
+
+
+
+    public void SetProbePositionSphericalRig()
+    {
+        //Move probe tip position to be at the center of the the rig.
+        SetProbePositionToSphericalRigCenter(rigController.rigCenter);
+
+        // Set XYZ
+        rigCoordinates.manipulatorX = Mathf.Clamp(rigCoordinates.manipulatorX, -7.5f, 7.5f);
+        rigCoordinates.manipulatorY = Mathf.Clamp(rigCoordinates.manipulatorY, -7.5f, 7.5f);
+        rigCoordinates.manipulatorZ = Mathf.Clamp(rigCoordinates.manipulatorZ, -7.5f, 7.5f);
+        rigCoordinates.mlArcAngle = Mathf.Clamp(rigCoordinates.mlArcAngle, -40f, 40f);
+        rigCoordinates.apArcAngle = Mathf.Clamp(rigCoordinates.apArcAngle, -75f, 75f);
+
+        transform.Translate(rigCoordinates.manipulatorX, -rigCoordinates.manipulatorZ, rigCoordinates.manipulatorY);
+
+        //Set Roll
+        transform.RotateAround(rigController.rigCenter.position, new Vector3(0f, 0f, 1f), rigCoordinates.mlArcAngle);
+
+        //Set Pitch
+        transform.RotateAround(rigController.rigCenter.position, new Vector3(-1f, 0f, 0f), rigCoordinates.apArcAngle-rigController.APOffsetAngle);
+        
+        //Spin
+        transform.RotateAround(rotateAround.position, rotateAround.up, rigCoordinates.spin);
+    }
+
+    public void SetProbePositionToSphericalRigCenter(Transform rigCenter)
+    {
+        //Set Rotation to zero!
+        transform.rotation =  Quaternion.identity;//;initialRotation; 
+        //Debug.Log(initialRotation);
+        transform.Rotate(new Vector3(0f, 180f, 0f)); //Our zero is different from Unity's
+        //Find difference between probe tip and rig center
+        Vector3 diff = probeTipT.position - rigCenter.position;
+        //Move to rig center
+        transform.position -= diff;
+        //apml = apml - new Vector2(diff.x, diff.z);
+    }
+
+    public void MoveToSphericalRigCoordinates(SphericalRigCoordinates newCoordinates){
+        rigCoordinates = newCoordinates;
+        SetProbePositionSphericalRig();
+    }
+
+    
+    public void CreateSphericalRigCoordinates()
+    {
+        SetProbePositionToSphericalRigCenter(rigController.rigCenter);
+        rigCoordinates = new SphericalRigCoordinates(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+    }
+    #endregion
+
+
 
 
     /// <summary>

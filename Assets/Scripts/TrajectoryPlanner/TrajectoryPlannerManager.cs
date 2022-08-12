@@ -52,7 +52,7 @@ namespace TrajectoryPlanner
         private List<CoordinateTransform> availableCoordinateTransforms;
 
         // Local tracking variables
-        private ProbeManager activeProbeController;
+        [SerializeField] private ProbeManager activeProbeController;
         private List<ProbeManager> allProbes;
         private List<Collider> inactiveProbeColliders;
         private List<Collider> allProbeColliders;
@@ -73,6 +73,11 @@ namespace TrajectoryPlanner
 
         // Manual coordinate entry
         [SerializeField] private TP_CoordinateEntryPanel manualCoordinatePanel;
+        [SerializeField] private TP_SphericalCoordinateEntryPanel sphericalCoordinatePanel;
+        public GameObject thisCoordinatePanel;
+
+        // Rig controller object for AIND rigs
+        private SphericalRigController rigController;
 
         // Track who got clicked on, probe, camera, or brain
         private bool probeControl;
@@ -138,6 +143,19 @@ namespace TrajectoryPlanner
             SetInVivoTransformState(localPrefs.GetStereotaxic());
             SetUseIBLAngles(localPrefs.GetUseIBLAngles());
             SetSurfaceDebugVisibility(localPrefs.GetSurfaceCoord());
+
+            try
+            {
+                Debug.Log("Trying to find Spherical Rig");
+                thisCoordinatePanel = sphericalCoordinatePanel.gameObject;
+                Debug.Log("Found Spherical Rig");
+            }
+            catch (NullReferenceException e)
+            {
+               Debug.LogWarning("Failed to Spherical Rig");
+                thisCoordinatePanel = manualCoordinatePanel.gameObject;
+            }
+
         }
         public async void CheckForSavedProbes(Task annotationDatasetLoadTask)
         {
@@ -294,7 +312,7 @@ namespace TrajectoryPlanner
                 return;
             }
 
-            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C)) && Input.GetKeyDown(KeyCode.Backspace) && !manualCoordinatePanel.gameObject.activeSelf)
+            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C)) && Input.GetKeyDown(KeyCode.Backspace) && !thisCoordinatePanel.activeSelf)
             {
                 RecoverActiveProbeController();
                 return;
@@ -302,7 +320,7 @@ namespace TrajectoryPlanner
 
             if (Input.anyKey && activeProbeController != null && !searchInput.isFocused)
             {
-                if (Input.GetKeyDown(KeyCode.Backspace) && !manualCoordinatePanel.gameObject.activeSelf)
+                if (Input.GetKeyDown(KeyCode.Backspace) && !thisCoordinatePanel.activeSelf)
                 {
                     DestroyActiveProbeController();
                     return;
@@ -310,7 +328,7 @@ namespace TrajectoryPlanner
 
                 if (Input.GetKeyDown(KeyCode.M))
                 {
-                    manualCoordinatePanel.gameObject.SetActive(!manualCoordinatePanel.gameObject.activeSelf);
+                    thisCoordinatePanel.gameObject.SetActive(!thisCoordinatePanel.gameObject.activeSelf);
                 }
 
                 // Check if mouse buttons are down, or if probe is under manual control
@@ -546,6 +564,10 @@ namespace TrajectoryPlanner
         public ProbeManager GetActiveProbeController()
         {
             return activeProbeController;
+        }
+
+        public List<ProbeManager> GetAllProbeControllers(){
+            return allProbes;
         }
 
         public bool MovedThisFrame()
