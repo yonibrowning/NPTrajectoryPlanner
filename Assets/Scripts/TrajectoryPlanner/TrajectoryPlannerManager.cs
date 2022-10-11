@@ -72,7 +72,7 @@ namespace TrajectoryPlanner
         private List<ProbeManager> allProbeManagers;
         private List<Collider> inactiveProbeColliders;
         private List<Collider> allProbeColliders;
-        private List<Collider> rigColliders;
+        [SerializeField] private List<Collider> rigColliders;
         private List<Collider> allNonActiveColliders;
 
         private static List<Color> probeColors = new List<Color> { ColorFromRGB(114, 87, 242), ColorFromRGB(240, 144, 96), ColorFromRGB(71, 147, 240), ColorFromRGB(240, 217, 48), ColorFromRGB(60, 240, 227),
@@ -640,7 +640,7 @@ namespace TrajectoryPlanner
             UpdateProbeColliders();
 
             // Also update the recording region size slider
-            recRegionSlider.SliderValueChanged(((DefaultProbeController)activeProbe.GetProbeController()).GetRecordingRegionSize());
+            recRegionSlider.SliderValueChanged(((ProbeController)activeProbe.GetProbeController()).GetRecordingRegionSize());
 
             // Reset the inplane slice zoom factor
             inPlaneSlice.ResetZoom();

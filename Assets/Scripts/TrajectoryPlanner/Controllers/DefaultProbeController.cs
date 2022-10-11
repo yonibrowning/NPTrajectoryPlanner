@@ -119,7 +119,7 @@ public class DefaultProbeController : ProbeController
         keySlow = Input.GetKey(KeyCode.LeftControl);
     }
 
-    public bool MoveProbe_Keyboard(bool checkForCollisions)
+    public override bool MoveProbe_Keyboard(bool checkForCollisions)
     {
         // drag movement takes precedence
         if (dragging)
@@ -659,7 +659,7 @@ public class DefaultProbeController : ProbeController
     #endregion
 
     #region Recording region UI
-    public void ChangeRecordingRegionSize(float newSize)
+    public override void ChangeRecordingRegionSize(float newSize)
     {
         recordingRegionSizeY = newSize;
 
@@ -831,7 +831,7 @@ public class DefaultProbeController : ProbeController
     /// Return the height of the bottom in mm and the total height
     /// </summary>
     /// <returns>float array [0]=bottom, [1]=height</returns>
-    public (float, float) GetRecordingRegionHeight()
+    public override (float, float) GetRecordingRegionHeight()
     {
         return (recordingRegionGOs[0].transform.localPosition.y - minRecordHeight, recordingRegionSizeY);
     }
@@ -840,7 +840,7 @@ public class DefaultProbeController : ProbeController
     /// Return the current size of the recording region
     /// </summary>
     /// <returns>size of the recording region</returns>
-    public float GetRecordingRegionSize()
+    public override float GetRecordingRegionSize()
     {
         return recordingRegionSizeY;
     }

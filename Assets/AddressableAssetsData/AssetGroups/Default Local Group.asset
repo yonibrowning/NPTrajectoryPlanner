@@ -15,15 +15,11 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_Data:
     m_SerializedData: []
-  m_GUID: eb9eb3c822ec72b468349d4e785d6617
-  m_SerializeEntries:
-  - m_GUID: cc9c563dcae3923469f616c5ff125232
-    m_Address: Assets/AddressableAssets/flatiron_info.txt
-    m_ReadOnly: 0
-    m_SerializedLabels: []
+  m_GUID: 82c3456c0faac412682b12537521e593
+  m_SerializeEntries: []
   m_ReadOnly: 0
-  m_Settings: {fileID: 11400000, guid: 2d938794e1ac8154b9b50ee21079a3c4, type: 2}
+  m_Settings: {fileID: 11400000, guid: 0971657f09fdf46b293c2b86160286ad, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: df729d60af727284aab7f4404c63d1a8, type: 2}
-    - {fileID: 11400000, guid: def0ca53aaa260c499b5675451913b0e, type: 2}
+    - {fileID: 11400000, guid: bd0b071720600474888827cb151a60da, type: 2}
+    - {fileID: 11400000, guid: 8daa5c4e4d01648f98448d2c29e999ee, type: 2}

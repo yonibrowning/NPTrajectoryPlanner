@@ -22,4 +22,15 @@ public class TP_ToggleRigs : MonoBehaviour
         Collider[] colliders = rigGOs[rigIdx].transform.GetComponentsInChildren<Collider>();
         tpmanager.UpdateRigColliders(colliders, rigGOs[rigIdx].activeSelf);
     }
+
+    public void AddRigGO(GameObject newRigGO){
+        rigGOs.Add(newRigGO);
+        //New obj will be active; add collider tracking
+        Collider[] colliders = newRigGO.transform.GetComponentsInChildren<Collider>();
+        tpmanager.UpdateRigColliders(colliders, true);
+    }
+
+    public int GetRigListLength(){
+        return rigGOs.Count;
+    }
 }

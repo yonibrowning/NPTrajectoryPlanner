@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 468a46d0ae32c3544b7d98094e6448a9, type: 3}
   m_Name: AddressableAssetSettings
   m_EditorClassIdentifier: 
-  m_DefaultGroup: eb9eb3c822ec72b468349d4e785d6617
+  m_DefaultGroup: 82c3456c0faac412682b12537521e593
   m_CachedHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
@@ -34,18 +34,18 @@ MonoBehaviour:
   m_MonoScriptBundleNaming: 0
   m_MonoScriptBundleCustomNaming: 
   m_RemoteCatalogBuildPath:
-    m_Id: 0dbfffed1e7d1434696f5a6193af38d3
+    m_Id: 8d294227e6e994fd3a0acbe9728872b1
   m_RemoteCatalogLoadPath:
-    m_Id: 8b0e868bf8565ef4ba5a95e7d57f666c
+    m_Id: https://data.virtualbrainlab.org/AddressablesStorage/[BuildTarget]
   m_ContentStateBuildPath: 
   m_BuildAddressablesWithPlayerBuild: 2
-  m_overridePlayerVersion: 
+  m_overridePlayerVersion: 0.2.0
   m_GroupAssets:
-  - {fileID: 11400000, guid: f5ef3838dcf03ab4b8a46a08e76e3145, type: 2}
-  - {fileID: 11400000, guid: d5389119c92750140ac9a693d91d803d, type: 2}
-  - {fileID: 11400000, guid: 3693e87d2b7c0ab4fa203210015d32dc, type: 2}
-  - {fileID: 11400000, guid: 115bf21d424a3b24aaee51444ffb542d, type: 2}
-  - {fileID: 11400000, guid: 59ffbdc4842bce949811dc8a3f2f6c37, type: 2}
+  - {fileID: 11400000, guid: 00da88e96c23d4436b4556538b52b7ed, type: 2}
+  - {fileID: 11400000, guid: fb9255cf0519440f8be816d4b44d3d1f, type: 2}
+  - {fileID: 11400000, guid: e9255e6838b54416793fc863709d8b41, type: 2}
+  - {fileID: 11400000, guid: 8894112df6816a243b462601dc3cdd45, type: 2}
+  - {fileID: 11400000, guid: e2eb373c76aa2514d83db8c3775ec380, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -54,33 +54,33 @@ MonoBehaviour:
   m_ProfileSettings:
     m_Profiles:
     - m_InheritedParent: 
-      m_Id: dff9ccd71970d8840aed7a0320906efa
+      m_Id: 8f7ae38a0d03a403e8ff92f773a9727b
       m_ProfileName: Default
       m_Values:
-      - m_Id: b28712faecae3244489993d74caf0ba7
+      - m_Id: cb5cf8fbe87ed4a4db1afa2055cfe7cf
         m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
-      - m_Id: 01e3c05280f34834eb3978814847c527
+      - m_Id: b1dd0f0e9a31a4757a408904e11c81a6
         m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
-      - m_Id: 6e9217891ed892f40b1933afda7ddded
+      - m_Id: 4a1dc4d1ec3f14b27813ac643342b2ec
         m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
-      - m_Id: 0dbfffed1e7d1434696f5a6193af38d3
+      - m_Id: 8d294227e6e994fd3a0acbe9728872b1
         m_Value: ServerData/[BuildTarget]
-      - m_Id: 8b0e868bf8565ef4ba5a95e7d57f666c
-        m_Value: http://data.virtualbrainlab.org/NPTrajData/0.8.1/[BuildTarget]
+      - m_Id: 778b3b19aa73b43dd91db4f1321e90ed
+        m_Value: http://data.virtualbrainlab.org/AddressablesStorage/[BuildTarget]
     m_ProfileEntryNames:
-    - m_Id: b28712faecae3244489993d74caf0ba7
+    - m_Id: cb5cf8fbe87ed4a4db1afa2055cfe7cf
       m_Name: BuildTarget
       m_InlineUsage: 0
-    - m_Id: 01e3c05280f34834eb3978814847c527
+    - m_Id: b1dd0f0e9a31a4757a408904e11c81a6
       m_Name: LocalBuildPath
       m_InlineUsage: 0
-    - m_Id: 6e9217891ed892f40b1933afda7ddded
+    - m_Id: 4a1dc4d1ec3f14b27813ac643342b2ec
       m_Name: LocalLoadPath
       m_InlineUsage: 0
-    - m_Id: 0dbfffed1e7d1434696f5a6193af38d3
+    - m_Id: 8d294227e6e994fd3a0acbe9728872b1
       m_Name: RemoteBuildPath
       m_InlineUsage: 0
-    - m_Id: 8b0e868bf8565ef4ba5a95e7d57f666c
+    - m_Id: 778b3b19aa73b43dd91db4f1321e90ed
       m_Name: RemoteLoadPath
       m_InlineUsage: 0
     m_ProfileVersion: 1
@@ -89,49 +89,20 @@ MonoBehaviour:
     - default
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
-  - {fileID: 11400000, guid: 1096ea4955b9c134aa225378f81a2df0, type: 2}
+  - {fileID: 11400000, guid: 65d21c2cc1d8b4dc0a6f320807b913b4, type: 2}
   m_InitializationObjects: []
   m_CertificateHandlerType:
     m_AssemblyName: 
     m_ClassName: 
   m_ActivePlayerDataBuilderIndex: 3
   m_DataBuilders:
-  - {fileID: 11400000, guid: a9b76b6fc38ca524e83f460f344d47ba, type: 2}
-  - {fileID: 11400000, guid: 7823640370daec140b301df16cada5bf, type: 2}
-  - {fileID: 11400000, guid: a8d03897e468ca34288b6f19b8c8076e, type: 2}
-  - {fileID: 11400000, guid: 90e8fd157c1476f419b29b740ad030c2, type: 2}
-  m_ActiveProfileId: dff9ccd71970d8840aed7a0320906efa
+  - {fileID: 11400000, guid: dfc3021a5e7c64d029abdc4795f42e2c, type: 2}
+  - {fileID: 11400000, guid: 80102aff574e14df8b58a78bd0671034, type: 2}
+  - {fileID: 11400000, guid: 0c2f43d3dd71e4d94af54722eda38227, type: 2}
+  - {fileID: 11400000, guid: 1ebb7b9921d0240babb54b648d3f7490, type: 2}
+  m_ActiveProfileId: 8f7ae38a0d03a403e8ff92f773a9727b
   m_HostingServicesManager:
-    m_HostingServiceInfos:
-    - classRef: UnityEditor.AddressableAssets.HostingServices.HttpHostingService,
-        Unity.Addressables.Editor
-      dataStore:
-        m_SerializedData:
-        - m_AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-          m_ClassName: System.Int32
-          m_Data: 57613
-          m_Key: HostingServicePort
-        - m_AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-          m_ClassName: System.Int32
-          m_Data: 0
-          m_Key: HostingServiceUploadSpeed
-        - m_AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-          m_ClassName: System.String
-          m_Data: ServerData/StandaloneWindows64
-          m_Key: ContentRoot
-        - m_AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-          m_ClassName: System.Boolean
-          m_Data: False
-          m_Key: IsEnabled
-        - m_AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-          m_ClassName: System.String
-          m_Data: Local Hosting 0
-          m_Key: DescriptiveName
-        - m_AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-          m_ClassName: System.Int32
-          m_Data: 0
-          m_Key: InstanceId
+    m_HostingServiceInfos: []
     m_Settings: {fileID: 11400000}
-    m_NextInstanceId: 1
-    m_RegisteredServiceTypeRefs:
-    - UnityEditor.AddressableAssets.HostingServices.HttpHostingService, Unity.Addressables.Editor
+    m_NextInstanceId: 0
+    m_RegisteredServiceTypeRefs: []

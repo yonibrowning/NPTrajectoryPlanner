@@ -9,4 +9,4 @@ EditorBuildSettings:
     path: Assets/Scenes/TrajectoryPlanner.unity
     guid: 01742bb73d3a1b644bfc1c77e581b6bc
   m_configObjects:
-    com.unity.addressableassets: {fileID: 11400000, guid: 7a4fe01e325f0b94f885b0111c032428, type: 2}
+    com.unity.addressableassets: {fileID: 11400000, guid: 83d108602ebf845b3b25cf884083278a, type: 2}

@@ -27,6 +27,12 @@ public abstract class ProbeController : MonoBehaviour
     public abstract (Vector3 startCoordWorld, Vector3 endCoordWorld) GetRecordingRegionWorld();
     public abstract (Vector3 startCoordWorld, Vector3 endCoordWorld) GetRecordingRegionWorld(Transform tipTransform);
 
+    public abstract float GetRecordingRegionSize();
+    public abstract (float,float) GetRecordingRegionHeight();
+
+    public abstract void ChangeRecordingRegionSize(float newSize);
+
+    public abstract bool MoveProbe_Keyboard(bool checkForCollisions);
     public abstract void ResetInsertion();
 
     public abstract void ResetPosition();

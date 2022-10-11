@@ -16,6 +16,8 @@ namespace TrajectoryPlanner
         private TP_QuestionDialogue _questionDialogue;
 
         [SerializeField] private TP_CoordinateEntryPanel coordinatePanel;
+        [SerializeField] private TP_CoordinateEntryPanel_SphericalRig sphericalCoordinatePanel;
+
         [SerializeField] private CanvasGroup positionFields;
         [SerializeField] private CanvasGroup angleFields;
         [SerializeField] private CanvasGroup buttons;
@@ -60,7 +62,12 @@ namespace TrajectoryPlanner
                 panelTitle.text = probeManager.GetID().ToString();
                 panelTitle.color = probeManager.GetColor();
 
-                coordinatePanel.LinkProbe(probeManager);
+                //BAD HACK; SHOULD BE BETTER
+                try{
+                    coordinatePanel.LinkProbe(probeManager);
+                }catch{
+                    sphericalCoordinatePanel.LinkProbe(probeManager);
+                }
 
                 UpdateInteractable();
                 UpdateCoordinates();
@@ -85,7 +92,12 @@ namespace TrajectoryPlanner
 
         public void UpdateCoordinates()
         {
-            coordinatePanel.UpdateText();
+            //BAD HACK; SHOULD BE BETTER
+            try{
+                coordinatePanel.UpdateText();
+            }catch{
+                sphericalCoordinatePanel.UpdateText();
+            }
         }
 
         /// <summary>

@@ -23,18 +23,24 @@ public class DefaultProbeCollider : MonoBehaviour
         if (EventSystem.current.IsPointerOverGameObject())
             return;
         tpmanager.SetActiveProbe(probeManager);
-        ((DefaultProbeController)probeManager.GetProbeController()).DragMovementClick();
+        try{
+            ((DefaultProbeController)probeManager.GetProbeController()).DragMovementClick();
+        }catch{};
     }
 
     private void OnMouseDrag()
     {
         if (EventSystem.current.IsPointerOverGameObject())
             return;
-        ((DefaultProbeController)probeManager.GetProbeController()).DragMovementDrag();
+        try{
+            ((DefaultProbeController)probeManager.GetProbeController()).DragMovementDrag();
+        }catch{};
     }
 
     private void OnMouseUp()
     {
-        ((DefaultProbeController)probeManager.GetProbeController()).DragMovementRelease();
+        try{
+            ((DefaultProbeController)probeManager.GetProbeController()).DragMovementRelease();
+        }catch{};
     }
 }
