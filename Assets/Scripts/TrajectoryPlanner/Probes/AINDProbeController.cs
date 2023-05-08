@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 
-public class DefaultProbeController : ProbeController
+public class AINDProbeController : ProbeController
 {
     #region Movement Constants
     private const float REC_HEIGHT_SPEED = 0.1f;
@@ -30,8 +30,11 @@ public class DefaultProbeController : ProbeController
     #endregion
 
     #region Angle limits
-    private const float minTheta = -90f;
-    private const float maxTheta = 0f;
+    private const float minTheta = -75f;
+    private const float maxTheta = 75f;
+
+    private const float minPhi = -42.5f;
+    private const float maxPhi = 42.5f;
     #endregion
 
     #region Recording region
@@ -42,9 +45,9 @@ public class DefaultProbeController : ProbeController
 
     #region Defaults
     // in ap/ml/dv
-    private Vector3 defaultStart = Vector3.zero; // new Vector3(5.4f, 5.7f, 0.332f);
+    //private Vector3 defaultStart = Vector3.zero; // new Vector3(5.4f, 5.7f, 0.332f);
     private float defaultDepth = 0f;
-    private Vector2 defaultAngles = new Vector2(-90f, 0f); // 0 phi is forward, default theta is 90 degrees down from horizontal, but internally this is a value of 0f
+    private Vector2 defaultAngles = new Vector2(0f, 0f); // 0 phi is forward, default theta is 90 degrees down from horizontal, but internally this is a value of 0f
     #endregion
 
     private Vector3 _initialPosition;
@@ -62,6 +65,8 @@ public class DefaultProbeController : ProbeController
 
     public override Transform ProbeTipT { get { return _probeTipT; } }
 
+    public Vector3 rigCenter;
+
     private void Awake()
     {
         // Create two points offset from the tip that we'll use to interpolate where we are on the probe
@@ -73,6 +78,9 @@ public class DefaultProbeController : ProbeController
         probeTipTop.transform.parent = _probeTipT;
         probeTipTop.transform.position = _probeTipT.position + _probeTipT.up * 10.2f;
 
+        //Find the rig center. It is a singleton, so this should be safe.
+        rigCenter = GameObject.Find("RigCenter").transform.position;
+
         depth = defaultDepth;
 
         _initialPosition = transform.position;
@@ -80,7 +88,7 @@ public class DefaultProbeController : ProbeController
 
         UpdateRecordingRegionVars();
 
-        Insertion = new ProbeInsertion(defaultStart, defaultAngles, CoordinateSpaceManager.ActiveCoordinateSpace, CoordinateSpaceManager.ActiveCoordinateTransform);
+        Insertion = new ProbeInsertion(rigCenter, defaultAngles, CoordinateSpaceManager.ActiveCoordinateSpace, CoordinateSpaceManager.ActiveCoordinateTransform);
     }
 
     private void Start()
@@ -89,7 +97,7 @@ public class DefaultProbeController : ProbeController
     }
 
     /// <summary>
-    /// Put this probe back at Bregma
+    /// Put this probe back at Rig Center
     /// </summary>
     public override void ResetInsertion()
     {
@@ -100,7 +108,7 @@ public class DefaultProbeController : ProbeController
 
     public override void ResetPosition()
     {
-        Insertion.apmldv = defaultStart;
+        Insertion.apmldv = rigCenter;
     }
 
     public override void ResetAngles()
@@ -201,7 +209,7 @@ public class DefaultProbeController : ProbeController
             keyHeld = false;
 
         // DV movement
-
+        /* motion in Z (other than advancing the probe) is not possible using the AIND rig.
         if (Input.GetKeyDown(KeyCode.Q))
         {
             moved = true;
@@ -233,7 +241,7 @@ public class DefaultProbeController : ProbeController
         }
         if (Input.GetKeyUp(KeyCode.E))
             keyHeld = false;
-
+        */
         // Depth movement
 
         if (Input.GetKeyDown(KeyCode.Z))
@@ -241,13 +249,16 @@ public class DefaultProbeController : ProbeController
             moved = true;
             keyPressTime = Time.realtimeSinceStartup;
             ProbeManager.SetDropToSurfaceWithDepth(true);
-            MoveProbeDepth(1f, true);
+            MoveProbeXYZ(0f, -1f, 0f, true);
+
+            //MoveProbeDepth(1f, true);
         }
         else if (Input.GetKey(KeyCode.Z) && (keyHeld || keyHoldDelayPassed))
         {
             keyHeld = true;
             moved = true;
-            MoveProbeDepth(1f, false);
+            MoveProbeXYZ(0f, -1f, 0f, false);
+            //MoveProbeDepth(1f, false);
         }
         if (Input.GetKeyUp(KeyCode.Z))
             keyHeld = false;
@@ -257,60 +268,63 @@ public class DefaultProbeController : ProbeController
             moved = true;
             keyPressTime = Time.realtimeSinceStartup;
             ProbeManager.SetDropToSurfaceWithDepth(true);
-            MoveProbeDepth(-1f, true);
+            MoveProbeXYZ(0f, 1f, 0f, true);
+            //MoveProbeDepth(-1f, true);
         }
         else if (Input.GetKey(KeyCode.X) && (keyHeld || keyHoldDelayPassed))
         {
             keyHeld = true;
             moved = true;
-            MoveProbeDepth(-1f, false);
+            MoveProbeXYZ(0f, 1f, 0f, false);
+
+            //MoveProbeDepth(-1f, false);
         }
         if (Input.GetKeyUp(KeyCode.X))
             keyHeld = false;
 
         // Rotations
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             moved = true;
             keyPressTime = Time.realtimeSinceStartup;
             RotateProbe(-1f, 0f, true);
         }
-        else if (Input.GetKey(KeyCode.Alpha1) && (keyHeld || keyHoldDelayPassed))
+        else if (Input.GetKey(KeyCode.Q) && (keyHeld || keyHoldDelayPassed))
         {
             keyHeld = true;
             moved = true;
             RotateProbe(-1f, 0f, false);
         }
-        if (Input.GetKeyUp(KeyCode.Alpha1))
+        if (Input.GetKeyUp(KeyCode.Q))
             keyHeld = false;
 
-        if (Input.GetKeyDown(KeyCode.Alpha3))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             moved = true;
             keyPressTime = Time.realtimeSinceStartup;
             RotateProbe(1f, 0f, true);
         }
-        else if (Input.GetKey(KeyCode.Alpha3) && (keyHeld || keyHoldDelayPassed))
+        else if (Input.GetKey(KeyCode.E) && (keyHeld || keyHoldDelayPassed))
         {
             keyHeld = true;
             moved = true;
             RotateProbe(1f, 0f, false);
         }
-        if (Input.GetKeyUp(KeyCode.Alpha3))
+        if (Input.GetKeyUp(KeyCode.E))
             keyHeld = false;
 
         if (Input.GetKeyDown(KeyCode.R))
         {
             moved = true;
             keyPressTime = Time.realtimeSinceStartup;
-            RotateProbe(0f, 1f, true);
+            RotateProbe(0f, -1f, true);
         }
         else if (Input.GetKey(KeyCode.R) && (keyHeld || keyHoldDelayPassed))
         {
             keyHeld = true;
             moved = true;
-            RotateProbe(0f, 1f, false);
+            RotateProbe(0f, -1f, false);
         }
         if (Input.GetKeyUp(KeyCode.R))
             keyHeld = false;
@@ -319,13 +333,13 @@ public class DefaultProbeController : ProbeController
         {
             moved = true;
             keyPressTime = Time.realtimeSinceStartup;
-            RotateProbe(0f, -1f, true);
+            RotateProbe(0f, 1f, true);
         }
         else if (Input.GetKey(KeyCode.F) && (keyHeld || keyHoldDelayPassed))
         {
             keyHeld = true;
             moved = true;
-            RotateProbe(0f, -1f, false);
+            RotateProbe(0f, 1f, false);
         }
         if (Input.GetKeyUp(KeyCode.F))
             keyHeld = false;
@@ -402,7 +416,7 @@ public class DefaultProbeController : ProbeController
         // Get the xyz transformation
         Vector3 xyz = new Vector3(x, y, z) * speed;
         // Rotate to match the probe axis directions
-        Insertion.apmldv += Insertion.World2TransformedAxisChange(xyz);
+        Insertion.apmldv += xyz;//Insertion.World2TransformedAxisChange(xyz);
     }
 
     public void MoveProbeDepth(float depth, bool pressed)
@@ -420,7 +434,7 @@ public class DefaultProbeController : ProbeController
             keyFast ? ROT_INCREMENT_TAP_FAST : keySlow ? ROT_INCREMENT_TAP_SLOW : ROT_INCREMENT_TAP :
             keyFast ? ROT_INCREMENT_HOLD_FAST * Time.deltaTime : keySlow ? ROT_INCREMENT_HOLD_SLOW * Time.deltaTime : ROT_INCREMENT_HOLD * Time.deltaTime;
 
-        Insertion.phi += phi * speed;
+        Insertion.phi = Mathf.Clamp(Insertion.phi+phi*speed,minPhi,maxPhi);
         Insertion.theta = Mathf.Clamp(Insertion.theta + theta * speed, minTheta, maxTheta);
     }
 
@@ -596,7 +610,7 @@ public class DefaultProbeController : ProbeController
 
         if (moved)
         {
-            Insertion.apmldv = origAPMLDV + Insertion.World2TransformedAxisChange(newXYZ);
+            Insertion.apmldv = origAPMLDV + newXYZ;//Insertion.World2TransformedAxisChange(newXYZ);
         }
 
         if (axisLockDepth)
@@ -614,7 +628,8 @@ public class DefaultProbeController : ProbeController
         }
         if (axisLockPhi)
         {
-            Insertion.phi = origPhi - 3f * worldOffset.x;
+            Insertion.phi = Mathf.Clamp(origPhi - 3f * worldOffset.x, minPhi, maxPhi);
+            //Insertion.phi = origPhi - 3f * worldOffset.x;
             moved = true;
         }
 
@@ -691,7 +706,6 @@ public class DefaultProbeController : ProbeController
     }
 
     #endregion
-
     #region Set Probe pos/angles
     
     public override float GetProbeDepth()
@@ -744,15 +758,21 @@ public class DefaultProbeController : ProbeController
 
         // Manually adjust the coordinates and rotation
         transform.position += localInsertion.PositionWorldT();
-        transform.RotateAround(_rotateAround.position, transform.up, localInsertion.phi);
-        transform.RotateAround(_rotateAround.position, transform.forward, localInsertion.theta);
+        transform.RotateAround(rigCenter, Vector3.forward, localInsertion.phi);
+        transform.RotateAround(rigCenter, Vector3.right, localInsertion.theta);
         transform.RotateAround(_rotateAround.position, _rotateAround.up, localInsertion.spin);
+
+
+        //transform.position += localInsertion.PositionWorldT();
+        //transform.RotateAround(_rotateAround.position, transform.up, localInsertion.phi);
+        //transform.RotateAround(_rotateAround.position, transform.forward, localInsertion.theta);
+        //transform.RotateAround(_rotateAround.position, _rotateAround.up, localInsertion.spin);
 
         // Compute depth transform, if needed
         if (depth != 0f)
         {
             transform.position += -transform.up * depth;
-            Vector3 depthAdjustment = Insertion.World2TransformedAxisChange(-transform.up) * depth;
+            Vector3 depthAdjustment = -transform.up*depth; //Insertion.World2TransformedAxisChange(-transform.up) * depth;
 
             localInsertion.apmldv += depthAdjustment;
             depth = 0f;

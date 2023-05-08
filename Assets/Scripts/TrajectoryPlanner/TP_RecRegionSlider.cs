@@ -35,7 +35,7 @@ public class TP_RecRegionSlider : MonoBehaviour
         if (probeManager != null)
         {
             // Get the slider size from the active probe
-            float value = ((DefaultProbeController)ProbeManager.ActiveProbeManager.GetProbeController()).GetRecordingRegionSize();
+            float value = ((ProbeController)ProbeManager.ActiveProbeManager.GetProbeController()).GetRecordingRegionSize();
 
             // Get active probe type from tpmanager
             float[] range = ranges[type2index[probeManager.ProbeType]];

@@ -38,7 +38,15 @@ public abstract class ProbeController : MonoBehaviour
 
     public abstract void SetProbePosition(Vector4 positionDepth);
 
+    public abstract (float, float) GetRecordingRegionHeight();
+
+    public abstract float GetRecordingRegionSize();
+
     public abstract void SetProbePosition(ProbeInsertion localInsertion);
 
     public abstract void SetProbeAngles(Vector3 angles);
+
+    public abstract void ChangeRecordingRegionSize(float newSize);
+
+    public abstract void MoveProbe_Keyboard();
 }

@@ -53,6 +53,13 @@ public class PlaceholderProbeController : ProbeController
     {
         throw new NotImplementedException();
     }
+    public override void ChangeRecordingRegionSize(float new_size){
+        throw new NotImplementedException();
+    }
+
+    public override void MoveProbe_Keyboard(){
+        throw new NotImplementedException();
+    }
 
     /// <summary>
     /// Set the probe position to the current apml/depth/phi/theta/spin values
@@ -127,9 +134,14 @@ public class PlaceholderProbeController : ProbeController
     /// Return the height of the bottom in mm and the total height
     /// </summary>
     /// <returns>float array [0]=bottom, [1]=height</returns>
-    public (float, float) GetRecordingRegionHeight()
+    public override (float, float) GetRecordingRegionHeight()
     {
         return (0, 0);
+    }
+
+    public override float GetRecordingRegionSize()
+    {
+        throw new NotImplementedException();
     }
 
     #endregion

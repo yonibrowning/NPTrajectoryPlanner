@@ -16,11 +16,7 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: c38eba58b74b0484d949bd1e7a528748
-  m_SerializeEntries:
-  - m_GUID: 427a7049607f12f4594cc689244380f8
-    m_Address: Assets/AddressableAssets/Textures/IBLCoverageTexture3D.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 2d938794e1ac8154b9b50ee21079a3c4, type: 2}
   m_SchemaSet:

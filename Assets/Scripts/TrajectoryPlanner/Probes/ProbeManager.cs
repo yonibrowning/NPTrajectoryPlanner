@@ -381,7 +381,7 @@ public class ProbeManager : MonoBehaviour
     /// <param name="newSize">New size of recording region in mm</param>
     public void ChangeRecordingRegionSize(float newSize)
     {
-        ((DefaultProbeController)_probeController).ChangeRecordingRegionSize(newSize);
+        ((ProbeController)_probeController).ChangeRecordingRegionSize(newSize);
 
         // Update all the UI panels
         UpdateUI();
@@ -398,7 +398,7 @@ public class ProbeManager : MonoBehaviour
         if (IsEphysLinkControlled)
             return;
 
-        ((DefaultProbeController)_probeController).MoveProbe_Keyboard();
+        ((ProbeController)_probeController).MoveProbe_Keyboard();
     }
 
     #region Text
