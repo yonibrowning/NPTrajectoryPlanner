@@ -7,20 +7,18 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using TrajectoryPlanner;
+using UnityEngine.Serialization;
 
 public class TP_SliceRenderer : MonoBehaviour
 {
-    [SerializeField] private GameObject sagittalSliceGO;
-    [SerializeField] private GameObject coronalSliceGO;
-    [SerializeField] private TrajectoryPlannerManager tpmanager;
-    [SerializeField] private CCFModelControl modelControl;
-    [SerializeField] private PlayerPrefs localPrefs;
-    [SerializeField] private TP_InPlaneSlice inPlaneSlice;
-    [SerializeField] private Utils util;
-    [SerializeField] private TMP_Dropdown dropdownMenu;
-    [SerializeField] private AssetReference iblCoverageTextureAssetRef;
-
-    private int[] baseSize = { 528, 320, 456 };
+    [FormerlySerializedAs("sagittalSliceGO")] [SerializeField] private GameObject _sagittalSliceGo;
+    [FormerlySerializedAs("coronalSliceGO")] [SerializeField] private GameObject _coronalSliceGo;
+    [FormerlySerializedAs("tpmanager")] [SerializeField] private TrajectoryPlannerManager _tpmanager;
+    [FormerlySerializedAs("modelControl")] [SerializeField] private CCFModelControl _modelControl;
+    [FormerlySerializedAs("inPlaneSlice")] [SerializeField] private TP_InPlaneSlice _inPlaneSlice;
+    [FormerlySerializedAs("util")] [SerializeField] private TP_Utils _util;
+    [FormerlySerializedAs("dropdownMenu")] [SerializeField] private TMP_Dropdown _dropdownMenu;
+    [FormerlySerializedAs("iblCoverageTextureAssetRef")] [SerializeField] private AssetReference _iblCoverageTextureAssetRef;
 
     private bool loaded;
 
@@ -32,115 +30,104 @@ public class TP_SliceRenderer : MonoBehaviour
 
     private void Awake()
     {
-        saggitalSliceMaterial = sagittalSliceGO.GetComponent<Renderer>().material;
-        coronalSliceMaterial = coronalSliceGO.GetComponent<Renderer>().material;
+        saggitalSliceMaterial = _sagittalSliceGo.GetComponent<Renderer>().material;
+        coronalSliceMaterial = _coronalSliceGo.GetComponent<Renderer>().material;
 
         loaded = false;
     }
 
     // Start is called before the first frame update
-    void Start()
-    {
-        AsyncStart();
-    }
-
-    public async void AsyncStart()
+    private async void Start()
     {
         Debug.Log("(SliceRenderer) Waiting for inplane slice to complete");
-        await inPlaneSlice.GetGPUTextureTask();
+        await _inPlaneSlice.GetGPUTextureTask();
+        Debug.Log("(SliceRenderer) Waiting for node models to load");
+        await _modelControl.GetDefaultLoadedTask();
 
-        Debug.Log("(SliceRenderer) Loading 3D texture");
-        ToggleSliceVisibility(localPrefs.GetSlice3D());
-
-        if (dropdownMenu.value == 1)
+        if (_dropdownMenu.value == 1)
             SetActiveTextureAnnotation();
-        else if (dropdownMenu.value == 2)
-            SetActiveTextureIBLCoverage();
+        //else if (dropdownMenu.value == 2)
+        //    SetActiveTextureIBLCoverage();
         loaded = true;
     }
 
 
-    private Texture3D iblCoverageTexture;
-    private bool coverageLoaded;
-    private bool coverageLoading;
+    //private Texture3D iblCoverageTexture;
+    //private bool coverageLoaded;
+    //private bool coverageLoading;
 
-    public async void LoadCoverageTexture()
-    {
-        coverageLoading = true;
+    //public async void LoadCoverageTexture()
+    //{
+    //    coverageLoading = true;
 
-        if (iblCoverageTextureAssetRef == null)
-        {
-            VolumetricDataset coverageDataset = tpmanager.GetIBLCoverageDataset();
-            if (coverageDataset == null)
-            {
-                await tpmanager.LoadIBLCoverageDataset();
-                coverageDataset = tpmanager.GetIBLCoverageDataset();
-            }
-            AnnotationDataset annotationDataset = tpmanager.GetAnnotationDataset();
+    //    if (iblCoverageTextureAssetRef == null)
+    //    {
+    //        VolumetricDataset coverageDataset = tpmanager.GetIBLCoverageDataset();
+    //        if (coverageDataset == null)
+    //        {
+    //            await tpmanager.LoadIBLCoverageDataset();
+    //            coverageDataset = tpmanager.GetIBLCoverageDataset();
+    //        }
+    //        AnnotationDataset annotationDataset = tpmanager.GetAnnotationDataset();
 
-            Color[] colors = new Color[] { Color.grey, Color.yellow, Color.green };
+    //        Color[] colors = new Color[] { Color.grey, Color.yellow, Color.green };
 
-            iblCoverageTexture = new Texture3D(528, 320, 456, TextureFormat.RGB24, false);
-            iblCoverageTexture.filterMode = FilterMode.Point;
-            iblCoverageTexture.wrapMode = TextureWrapMode.Clamp;
+    //        iblCoverageTexture = new Texture3D(528, 320, 456, TextureFormat.RGB24, false);
+    //        iblCoverageTexture.filterMode = FilterMode.Point;
+    //        iblCoverageTexture.wrapMode = TextureWrapMode.Clamp;
 
-            Debug.Log("Converting annotation dataset to texture format");
-            for (int ap = 0; ap < 528; ap++)
-            {
-                for (int dv = 0; dv < 320; dv++)
-                    for (int ml = 0; ml < 456; ml++)
-                        if (annotationDataset.ValueAtIndex(ap, dv, ml) > 0)
-                            iblCoverageTexture.SetPixel(ap, dv, ml, colors[coverageDataset.ValueAtIndex(ap, dv, ml)]);
-                        else
-                            iblCoverageTexture.SetPixel(ap, dv, ml, Color.black);
-            }
-            iblCoverageTexture.Apply();
+    //        Debug.Log("Converting annotation dataset to texture format");
+    //        for (int ap = 0; ap < 528; ap++)
+    //        {
+    //            for (int dv = 0; dv < 320; dv++)
+    //                for (int ml = 0; ml < 456; ml++)
+    //                    if (annotationDataset.ValueAtIndex(ap, dv, ml) > 0)
+    //                        iblCoverageTexture.SetPixel(ap, dv, ml, colors[coverageDataset.ValueAtIndex(ap, dv, ml)]);
+    //                    else
+    //                        iblCoverageTexture.SetPixel(ap, dv, ml, Color.black);
+    //        }
+    //        iblCoverageTexture.Apply();
 
-            //if (Application.isEditor)
-            //    AssetDatabase.CreateAsset(iblCoverageTexture, "Assets/AddressableAssets/Textures/IBLCoverageTexture3D.asset");
-        }
-        else
-        {
-            AsyncOperationHandle<Texture3D> dataLoader = iblCoverageTextureAssetRef.LoadAssetAsync<Texture3D>();
-            await dataLoader.Task;
-            iblCoverageTexture = dataLoader.Result;
-        }
-        coverageLoaded = true;
+    //        //if (Application.isEditor)
+    //        //    AssetDatabase.CreateAsset(iblCoverageTexture, "Assets/AddressableAssets/Textures/IBLCoverageTexture3D.asset");
+    //    }
+    //    else
+    //    {
+    //        AsyncOperationHandle<Texture3D> dataLoader = iblCoverageTextureAssetRef.LoadAssetAsync<Texture3D>();
+    //        await dataLoader.Task;
+    //        iblCoverageTexture = dataLoader.Result;
+    //    }
+    //    coverageLoaded = true;
 
-        SetActiveTextureIBLCoverage();
-    }
+    //    SetActiveTextureIBLCoverage();
+    //}
 
     private async void SetActiveTextureAnnotation()
     {
-        Task<Texture3D> textureTask = inPlaneSlice.GetAnnotationDatasetGPUTexture();
+        Task<Texture3D> textureTask = _inPlaneSlice.GetAnnotationDatasetGPUTexture();
         await textureTask;
 
         saggitalSliceMaterial.SetTexture("_Volume", textureTask.Result);
         coronalSliceMaterial.SetTexture("_Volume", textureTask.Result);
     }
 
-    private void SetActiveTextureIBLCoverage()
-    {
-        if (!coverageLoaded && !coverageLoading)
-        {
-            LoadCoverageTexture();
-            return;
-        }
-        saggitalSliceMaterial.SetTexture("_Volume", iblCoverageTexture);
-        coronalSliceMaterial.SetTexture("_Volume", iblCoverageTexture);
-    }
+    //private void SetActiveTextureIBLCoverage()
+    //{
+    //    if (!coverageLoaded && !coverageLoading)
+    //    {
+    //        LoadCoverageTexture();
+    //        return;
+    //    }
+    //    saggitalSliceMaterial.SetTexture("_Volume", iblCoverageTexture);
+    //    coronalSliceMaterial.SetTexture("_Volume", iblCoverageTexture);
+    //}
 
     private void Update()
     {
-        if (localPrefs.GetSlice3D()>0 && loaded)
+        if (Settings.Slice3DDropdownOption>0 && loaded)
         {
             // Check if the camera moved such that we have to flip the slice quads
             UpdateCameraPosition();
-
-            if (tpmanager.MovedThisFrame())
-            {
-                UpdateSlicePosition();
-            }
         }
     }
 
@@ -150,24 +137,29 @@ public class TP_SliceRenderer : MonoBehaviour
     /// <summary>
     /// Shift the position of the sagittal and coronal slices to match the tip of the active probe
     /// </summary>
-    private void UpdateSlicePosition()
+    public void UpdateSlicePosition()
     {
-        ProbeManager activeProbeController = tpmanager.GetActiveProbeController();
-        if (activeProbeController == null) return;
-        Transform activeProbeTipT = activeProbeController.GetTipTransform();
-        Vector3 tipPosition = activeProbeTipT.position + activeProbeTipT.up * 0.2f; // add 200 um to get to the start of the recording region
+        if (Settings.Slice3DDropdownOption > 0)
+        {
+            if (ProbeManager.ActiveProbeManager == null) return;
 
-        //Vector3 tipPositionAPDVLR = util.WorldSpace2apdvlr(tipPosition + tpmanager.GetCenterOffset());
+            // the actual tip
+            Vector3 probeTipWorld = ProbeManager.ActiveProbeManager.GetProbeController().ProbeTipT.position;
+            // position the slices along the real tip in world space
+            _coronalSliceGo.transform.position = new Vector3(0f, 0f, probeTipWorld.z);
+            _sagittalSliceGo.transform.position = new Vector3(probeTipWorld.x, 0f, 0f);
 
-        apWorldmm = tipPosition.z + 6.6f;
-        coronalSliceGO.transform.position = new Vector3(0f, 0f, tipPosition.z);
-        coronalSliceMaterial.SetFloat("_SlicePosition", apWorldmm / 13.2f);
+            // for CCF coordinates
+            (Vector3 tipCoordWorld, _, _) = ProbeManager.ActiveProbeManager.GetProbeController().GetTipWorldU();
 
-        mlWorldmm = -(tipPosition.x - 5.7f);
-        sagittalSliceGO.transform.position = new Vector3(tipPosition.x, 0f, 0f);
-        saggitalSliceMaterial.SetFloat("_SlicePosition", mlWorldmm / 11.4f);
+            apWorldmm = tipCoordWorld.z + 6.6f;
+            coronalSliceMaterial.SetFloat("_SlicePosition", apWorldmm / 13.2f);
 
-        UpdateNodeModelSlicing();
+            mlWorldmm = -(tipCoordWorld.x - 5.7f);
+            saggitalSliceMaterial.SetFloat("_SlicePosition", mlWorldmm / 11.4f);
+
+            UpdateNodeModelSlicing();
+        }
     }
 
     private void UpdateCameraPosition()
@@ -198,10 +190,10 @@ public class TP_SliceRenderer : MonoBehaviour
             UpdateNodeModelSlicing();
     }
 
-        private void UpdateNodeModelSlicing()
+    private void UpdateNodeModelSlicing()
     {
         // Update the renderers on the node objects
-        foreach (CCFTreeNode node in modelControl.GetDefaultLoadedNodes())
+        foreach (CCFTreeNode node in _modelControl.GetDefaultLoadedNodes())
         {
             if (camYBack)
                 // clip from apPosition forward
@@ -220,7 +212,7 @@ public class TP_SliceRenderer : MonoBehaviour
     private void ClearNodeModelSlicing()
     {
         // Update the renderers on the node objects
-        foreach (CCFTreeNode node in modelControl.GetDefaultLoadedNodes())
+        foreach (CCFTreeNode node in _modelControl.GetDefaultLoadedNodes())
         {
             node.SetShaderProperty("_APClip", new Vector2(0f, 13.2f));
             node.SetShaderProperty("_MLClip", new Vector2(0f, 11.4f));
@@ -229,26 +221,23 @@ public class TP_SliceRenderer : MonoBehaviour
 
     public void ToggleSliceVisibility(int sliceType)
     {
-        localPrefs.SetSlice3D(sliceType);
-
         if (sliceType==0)
         {
             // make slices invisible
-            sagittalSliceGO.SetActive(false);
-            coronalSliceGO.SetActive(false);
+            _sagittalSliceGo.SetActive(false);
+            _coronalSliceGo.SetActive(false);
             ClearNodeModelSlicing();
         }
         else
         {
             // Standard sagittal/coronal slices
-            localPrefs.SetSlice3D(sliceType);
-            sagittalSliceGO.SetActive(true);
-            coronalSliceGO.SetActive(true);
+            _sagittalSliceGo.SetActive(true);
+            _coronalSliceGo.SetActive(true);
 
             if (sliceType == 1)
                 SetActiveTextureAnnotation();
-            else if (sliceType == 2)
-                SetActiveTextureIBLCoverage();
+            //else if (sliceType == 2)
+            //    SetActiveTextureIBLCoverage();
 
             UpdateSlicePosition();
             UpdateCameraPosition();

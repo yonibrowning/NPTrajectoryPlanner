@@ -149,3 +149,15 @@ fabric.properties
 # End of https://www.toptal.com/developers/gitignore/api/rider
 Assets/AddressableAssets.zip
 Assets/AddressableAssets.zip.meta
+
+Assets/InitTestScene*
+UserSettings/Layouts/*
+
+UserSettings/
+Assets/AddressableAssetsData/link.xml
+Assets/AddressableAssetsData/link.xml.meta
+Assets/StreamingAssets/catalog.bin.meta
+Assets/StreamingAssets/catalog.bin
+Assets/Resources/PerformanceTestRunInfo.json.meta
+Assets/Resources/PerformanceTestRunInfo.json
+Assets/CleanFlatUI/*

@@ -1,0 +1,17 @@
+{
+    "name": "trajectoryplanner.ephyslink",
+    "rootNamespace": "",
+    "references": [
+        "BestHTTP",
+        "trajectoryplanner.core.utilities"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

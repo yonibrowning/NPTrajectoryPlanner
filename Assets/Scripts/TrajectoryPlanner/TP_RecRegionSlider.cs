@@ -4,18 +4,19 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using TrajectoryPlanner;
+using UnityEngine.Serialization;
 
 public class TP_RecRegionSlider : MonoBehaviour
 {
-    [SerializeField] private TrajectoryPlannerManager tpmanager;
-    [SerializeField] private Slider uiSlider;
-    [SerializeField] private TextMeshProUGUI recRegionSizeText;
+    [FormerlySerializedAs("tpmanager")] [SerializeField] private TrajectoryPlannerManager _tpmanager;
+    [FormerlySerializedAs("uiSlider")] [SerializeField] private Slider _uiSlider;
+    [FormerlySerializedAs("recRegionSizeText")] [SerializeField] private TextMeshProUGUI _recRegionSizeText;
 
     private float[] np1Range = { 3.84f, 7.68f };
     private float[] np2Range = { 2.88f, 5.76f };
     private float[] np24Range = { 0.72f, 1.44f, 2.88f, 5.76f };
     private List<float[]> ranges;
-    private int[] type2index = { -1, 0, 1, -1, 2 };
+    private int[] type2index = { -1, 0, 1, -1, 2, -1, -1, -1, 2 };
 
     public TP_RecRegionSlider()
     {
@@ -25,17 +26,25 @@ public class TP_RecRegionSlider : MonoBehaviour
         ranges.Add(np24Range);
     }
 
-    public void SliderValueChanged(float value)
+    public void SliderValueChanged()
     {
-        if (tpmanager.GetActiveProbeController() != null)
-        {
-            // Get active probe type from tpmanager
-            float[] range = ranges[type2index[tpmanager.GetActiveProbeType()]];
-            uiSlider.value = Round2Nearest(value, range);
-            tpmanager.GetActiveProbeController().ChangeRecordingRegionSize(uiSlider.value);
-            tpmanager.UpdateInPlaneView();
+        if (UIManager.InputsFocused)
+            return;
 
-            recRegionSizeText.text = "Recording region size: " + uiSlider.value;
+        ProbeManager probeManager = ProbeManager.ActiveProbeManager;
+        if (probeManager != null)
+        {
+            // Get the slider size from the active probe
+            float value = ((DefaultProbeController)ProbeManager.ActiveProbeManager.GetProbeController()).GetRecordingRegionSize();
+
+            // Get active probe type from tpmanager
+            float[] range = ranges[type2index[probeManager.ProbeType]];
+            _uiSlider.value = Round2Nearest(value, range);
+            probeManager.ChangeRecordingRegionSize(_uiSlider.value);
+
+            probeManager.UpdateUI();
+
+            _recRegionSizeText.text = "Recording region size: " + _uiSlider.value;
         }
     }
 
